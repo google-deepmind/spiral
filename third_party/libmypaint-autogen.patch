@@ -1,0 +1,12 @@
+--- autogen.sh	2016-12-01 22:47:14.000000000 +0000
++++ autogen.sh	2019-06-06 13:33:05.000000000 +0100
+@@ -127,6 +127,9 @@
+ if ($AUTOMAKE --version) < /dev/null > /dev/null 2>&1; then
+    AUTOMAKE=$AUTOMAKE
+    ACLOCAL=$ACLOCAL
++elif (automake-1.16 --version) < /dev/null > /dev/null 2>&1; then
++   AUTOMAKE=automake-1.16
++   ACLOCAL=aclocal-1.16
+ elif (automake-1.15 --version) < /dev/null > /dev/null 2>&1; then
+    AUTOMAKE=automake-1.15
+    ACLOCAL=aclocal-1.15
