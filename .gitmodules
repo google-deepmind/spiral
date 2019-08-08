@@ -1,0 +1,12 @@
+[submodule "third_party/pybind11"]
+	path = third_party/pybind11
+	url = https://github.com/pybind/pybind11
+[submodule "third_party/glog"]
+	path = third_party/glog
+	url = https://github.com/google/glog
+[submodule "third_party/absl"]
+	path = third_party/absl
+	url = https://github.com/abseil/abseil-cpp
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest
