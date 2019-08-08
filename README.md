@@ -1,5 +1,7 @@
 # SPIRAL
 
+# ![default_wgangp_celebahq64_gen_19steps](media/default_wgangp_celebahq64_gen_19steps.gif)
+
 ## Overview
 
 This repository contains agents and environments described in the ICML'18
