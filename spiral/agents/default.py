@@ -50,6 +50,8 @@ class AutoregressiveHeads(snt.AbstractModule):
   ORDERS = {
       "libmypaint": ["flag", "end", "control", "size", "pressure",
                      "red", "green", "blue"],
+      "fluid": ["flag", "end", "control", "size", "speed",
+                "red", "green", "blue", "alpha"],
   }
 
   def __init__(self,
@@ -82,6 +84,7 @@ class AutoregressiveHeads(snt.AbstractModule):
       for k, v in six.iteritems(action_spec):
         if k in LOCATION_KEYS:
           decoder = utils.ConvDecoder(  # pylint: disable=not-callable
+              name=k + "_action_decoder",
               **decoder_params)
           action_head = snt.Sequential([
               snt.BatchReshape([4, 4, -1]),

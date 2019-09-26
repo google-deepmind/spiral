@@ -8,12 +8,15 @@
 
 This repository contains agents and environments described in the ICML'18
 paper ["Synthesizing Programs for Images using Reinforced Adversarial Learning"](http://proceedings.mlr.press/v80/ganin18a.html).
-For the time being, we are providing the
-[`libmypaint`](https://github.com/mypaint/libmypaint)-based simulator
-(more coming soon) and a [Sonnet](https://github.com/deepmind/sonnet) module
+For the time being, we are providing two simulators:
+one based on [`libmypaint`](https://github.com/mypaint/libmypaint) and one
+based on [`Fluid Paint`](https://github.com/dli/paint) (**NOTE:** our
+implementation is written in `C++` whereas the original is in `javascript`).
+Additionally, we supply a [Sonnet](https://github.com/deepmind/sonnet) module
 for the unconditional agent as well as
-[pre-trained model snapshots](https://tfhub.dev/s?q=spiral%2Fdefault-wgangp-celebahq64-gen-19steps)
-(9 agents from a single population) available from [TF-Hub](https://www.tensorflow.org/hub).
+[pre-trained model snapshots](https://tfhub.dev/s?q=spiral)
+(9 agents from a single population for `libmypaint` and 1 agent for
+`Fluid Paint`) available from [TF-Hub](https://www.tensorflow.org/hub).
 
 If you feel an immediate urge to dive into the code the most relevant files are:
 
@@ -21,6 +24,7 @@ If you feel an immediate urge to dive into the code the most relevant files are:
 | :--- | :--- |
 | [`spiral/agents/default.py`](spiral/agents/default.py) | The architecture of the agent |
 | [`spiral/environments/libmypaint.py`](spiral/environments/libmypaint.py) | The `libmypaint`-based environment |
+| [`spiral/environments/fluid.py`](spiral/environments/fluid.py) | The `Fluid Paint`-based environment |
 
 ## Reference
 
@@ -46,11 +50,11 @@ cd spiral
 git submodule update --init --recursive
 ```
 
-Install necessary packages:
+Install required packages:
 
 ```shell
-apt-get install cmake pkg-config libjson-c-dev intltool libpython3-dev python3-pip
-pip3 install six setuptools numpy tensorflow==1.14 tensorflow-hub dm-sonnet
+apt-get install cmake pkg-config protobuf-compiler libjson-c-dev intltool libpython3-dev python3-pip
+pip3 install six setuptools numpy scipy tensorflow==1.14 tensorflow-hub dm-sonnet==1.35
 ```
 
 **WARNING:** Make sure that you have `cmake` **3.14** or later since we rely
@@ -74,6 +78,15 @@ place them in `third_party` folder like this:
 wget -c https://github.com/mypaint/mypaint-brushes/archive/v1.3.0.tar.gz -O - | tar -xz -C third_party
 ```
 
+Finally, the `Fluid Paint` environment depends on the shaders from the original
+`javascript` [implementation](https://github.com/dli/paint). You can obtain
+them by running the following commands:
+
+```shell
+git clone https://github.com/dli/paint third_party/paint
+patch third_party/paint/shaders/setbristles.frag third_party/paint-setbristles.patch
+```
+
 Optionally, in order to be able to try out the package in the provided
 `jupyter` [notebook](notebooks/spiral-demo.ipynb), you’ll need to install
 the following packages:
@@ -90,9 +103,10 @@ For a basic example of how to use the package please follow
 
 ### Sampling from a pre-trained model
 
-We provide a [pre-trained model]() for unconditional 19-step generation of
-[CelebA-HQ](https://github.com/tkarras/progressive_growing_of_gans) images.
-Here is how you can sample from it:
+We provide [pre-trained models](https://tfhub.dev/s?q=spiral) for unconditional
+19-step generation of [CelebA-HQ](https://github.com/tkarras/progressive_growing_of_gans)
+images. Here is an example of how you can sample from an agent interacting
+with the `libmypaint` environment:
 
 ```python
 import matplotlib.pyplot as plt

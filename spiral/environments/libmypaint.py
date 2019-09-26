@@ -30,6 +30,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
+from spiral.environments import utils
 from spiral.environments import pylibmypaint
 
 
@@ -87,14 +88,6 @@ class BrushSettings(enum.IntEnum):
    MYPAINT_BRUSH_SETTINGS_COUNT) = range(46)
 
 
-def quadratic_bezier(p_s, p_c, p_e, n):
-  t = np.linspace(0., 1., n)
-  t = t.reshape((1, n, 1))
-  p_s, p_c, p_e = [np.expand_dims(p, axis=1) for p in [p_s, p_c, p_e]]
-  p = (1 - t) * (1 - t) * p_s + 2 * (1 - t) * t * p_c + t * t * p_e
-  return p
-
-
 def _fix15_to_rgba(buf):
   """Converts buffer from a 15-bit fixed-point representation into uint8 RGBA.
 
@@ -114,40 +107,6 @@ def _fix15_to_rgba(buf):
   rgba = np.concatenate((rgb, alpha), axis=2)
   rgba = (255 * rgba + (1 << 15) // 2) // (1 << 15)
   return rgba.astype(np.uint8)
-
-
-def _rgb_to_hsv(red, green, blue):
-  """Converts RGB to HSV."""
-  hue = 0.0
-
-  red = np.clip(red, 0.0, 1.0)
-  green = np.clip(green, 0.0, 1.0)
-  blue = np.clip(blue, 0.0, 1.0)
-
-  max_value = np.max([red, green, blue])
-  min_value = np.min([red, green, blue])
-
-  value = max_value
-  delta = max_value - min_value
-
-  if delta > 0.0001:
-    saturation = delta / max_value
-
-    if red == max_value:
-      hue = (green - blue) / delta
-      if hue < 0.0:
-        hue += 6.0
-    elif green == max_value:
-      hue = 2.0 + (blue - red) / delta
-    elif blue == max_value:
-      hue = 4.0 + (red - green) / delta
-
-    hue /= 6.0
-  else:
-    saturation = 0.0
-    hue = 0.0
-
-  return hue, saturation, value
 
 
 class LibMyPaint(environment.Environment):
@@ -334,7 +293,7 @@ class LibMyPaint(environment.Environment):
       for k in rgb_keys:
         del kwargs[k]
       if self._use_color:
-        hue, saturation, value = _rgb_to_hsv(red, green, blue)
+        hue, saturation, value = utils.rgb_to_hsv(red, green, blue)
         kwargs.update(dict(
             hue=hue, saturation=saturation, value=value))
 
@@ -351,7 +310,7 @@ class LibMyPaint(environment.Environment):
     self._update_libmypaint_brush(**kwargs)
 
   def _reset_brush_params(self):
-    hue, saturation, value = _rgb_to_hsv(
+    hue, saturation, value = utils.rgb_to_hsv(
         self.R_VALUES[0], self.G_VALUES[0], self.B_VALUES[0])
     pressure = 0.0 if self._use_pressure else 1.0
     self._brush_params = collections.OrderedDict([
@@ -370,7 +329,8 @@ class LibMyPaint(environment.Environment):
     self._update_libmypaint_brush(**self._brush_params)
 
   def _move_to(self, y, x, update_brush_params=True):
-    self._update_brush_params(y=y, x=y, is_painting=False)
+    if update_brush_params:
+      self._update_brush_params(y=y, x=y, is_painting=False)
     self._brush.Reset()
     self._brush.NewStroke()
     self._brush.StrokeTo(x, y, 0.0, self.DTIME)
@@ -389,7 +349,7 @@ class LibMyPaint(environment.Environment):
     p_s = np.array([[y_s, x_s]])
     p_c = np.array([[y_c, x_c]])
     p_e = np.array([[y_e, x_e]])
-    points = quadratic_bezier(p_s, p_c, p_e, self.STROKES_PER_STEP + 1)[0]
+    points = utils.quadratic_bezier(p_s, p_c, p_e, self.STROKES_PER_STEP + 1)[0]
 
     # We need to perform this pseudo-stroke at the beginning of the curve
     # so that libmypaint handles the pressure correctly.

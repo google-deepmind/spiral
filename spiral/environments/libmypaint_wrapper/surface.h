@@ -24,7 +24,8 @@
 #include "libmypaint/mypaint-glib-compat.h"
 #include "libmypaint/mypaint-tiled-surface.h"
 
-namespace libmypaint_wrapper {
+namespace spiral {
+namespace libmypaint {
 
 struct Surface : MyPaintTiledSurface {
   // Size (in bytes) of single tile.
@@ -69,6 +70,7 @@ class SurfaceWrapper {
   Surface* const surface_;
 };
 
-}  // namespace libmypaint_wrapper
+}  // namespace libmypaint
+}  // namespace spiral
 
 #endif  // SPIRAL_ENVIRONMENTS_LIBMYPAINT_WRAPPER_SURFACE_H_
