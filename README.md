@@ -40,7 +40,16 @@ publication:
 }
 ```
 
+## Quickstart with Docker
+
+The easiest way to get SPIRAL up and running on your machine is to use a
+pre-built [Docker image](https://github.com/ddtm/spiral-docker).
+
 ## Installation
+
+This section describes how to build and install the package on Ubuntu (16.04 or
+newer). The following instructions (with slight modifications) might also work
+for other Linux distributions.
 
 Clone this repository and fetch the external submodules:
 
@@ -94,7 +103,6 @@ the following packages:
 ```shell
 pip3 install matplotlib jupyter
 ```
-
 
 ## Usage
 
